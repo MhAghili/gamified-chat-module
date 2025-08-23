@@ -1,32 +1,24 @@
 // src/App.js
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { gamificationAPI } from "./gamification-module";
+import ChatbotComponent from "./chatbot-host/ChatbotComponent";
 
 function App() {
   useEffect(() => {
-    // --- شبیه‌سازی تعامل کاربر با چت‌بات ---
-
-    // ۱. ماژول را برای کاربری با شناسه 'user-123' راه‌اندازی کن
+    // راه‌اندازی ماژول گیمیفیکیشن
     gamificationAPI.init("user-123");
-
-    // ۲. شبیه‌سازی اولین تعامل کاربر
+    // شبیه‌سازی اولین رویداد برای امتیازدهی اولیه
+    // ما این رویداد را قبل از نمایش کامپوننت چت‌بات فراخوانی می‌کنیم
     gamificationAPI.triggerEvent("INITIAL_INTERACTION");
-
-    // ۳. شبیه‌سازی پرسیدن یک سوال ساده
-    gamificationAPI.triggerEvent("ASKED_QUESTION", { questionText: "سلام" });
-
-    // ۴. شبیه‌سازی پرسیدن یک سوال عمیق‌تر
-    gamificationAPI.triggerEvent("ASKED_QUESTION", {
-      questionText: "چگونه می‌توانم پروفایلم را ویرایش کنم؟",
-    });
-
-    // برای دیدن تغییرات امتیاز و نشان‌ها، کنسول مرورگر را باز کنید
   }, []);
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>تست ماژول گیمیفیکیشن</h1>
-      <p>برای دیدن لاگ‌های رویدادها، کنسول مرورگر (F12) را باز کنید.</p>
+    <div>
+      <header style={{ padding: "20px", backgroundColor: "#eee" }}>
+        <h1>پروژه چت‌بات گیمیفای‌شده</h1>
+        <p>روی آیکون چت در پایین صفحه کلیک کنید.</p>
+      </header>
+      <ChatbotComponent />
     </div>
   );
 }
