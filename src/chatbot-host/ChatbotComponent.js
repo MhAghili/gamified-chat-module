@@ -2,9 +2,10 @@
 import React from "react";
 import ChatBot from "react-simple-chatbot";
 import { ThemeProvider } from "styled-components";
-
-// کامپوننت سفارشی خودمان را وارد می‌کنیم
+import GamificationFeedback from "../gamification-module/components/GamificationFeedback";
 import ScoreDisplay from "../gamification-module/components/ScoreDisplay";
+// ۱. API ماژول گیمیفیکیشن را وارد می‌کنیم
+import { gamificationAPI } from "../gamification-module";
 
 const theme = {
   background: "#f5f8fb",
@@ -19,6 +20,14 @@ const theme = {
 };
 
 const ChatbotComponent = () => {
+  // ۲. این تابع جدید را برای مدیریت رویدادها اضافه می‌کنیم
+  const handleEnd = ({ steps }) => {
+    // به مقدار آخرین مرحله ورودی کاربر با آیدی 'user_input' دسترسی پیدا می‌کنیم
+    const userInput = steps.user_input.value;
+    // رویداد را به موتور گیمیفیکیشن ارسال می‌کنیم
+    gamificationAPI.triggerEvent("ASKED_QUESTION", { questionText: userInput });
+  };
+
   const steps = [
     {
       id: "1",
@@ -35,25 +44,28 @@ const ChatbotComponent = () => {
       id: "3",
       message:
         "سلام {previousValue}، خوشبختم! ما برای تعاملات شما امتیاز در نظر می‌گیریم.",
-      trigger: "show-score",
+      trigger: "feedback_step", // به مرحله بازخورد می‌رویم
     },
     {
-      id: "show-score",
-      // اینجا جادو اتفاق می‌افتد!
-      // به جای message از component استفاده می‌کنیم
-      component: <ScoreDisplay />,
-      asMessage: true, // باعث می‌شود مانند یک پیام در چت نمایش داده شود
-      trigger: "4",
+      id: "feedback_step",
+      // اینجا از کامپوننت هوشمند جدیدمان استفاده می‌کنیم
+      component: <GamificationFeedback />,
+      asMessage: true,
+      waitAction: true, // منتظر می‌ماند تا triggerNextStep فراخوانی شود
+      trigger: "ask_question",
     },
     {
-      id: "4",
+      id: "ask_question",
       message: "هر سوالی دارید بپرسید.",
-      trigger: "5",
+      trigger: "user_input",
     },
     {
-      id: "5",
+      id: "user_input",
       user: true,
-      end: true,
+      trigger: ({ value }) => {
+        gamificationAPI.triggerEvent("ASKED_QUESTION", { questionText: value });
+        return "feedback_step"; // دوباره به مرحله بازخورد برمی‌گردیم
+      },
     },
   ];
 

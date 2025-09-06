@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 
 // تعریف وضعیت اولیه برای کاربر
@@ -11,21 +10,26 @@ const initialState = {
 
 export const useGameStore = create((set) => ({
   ...initialState,
+  newlyAwardedBadge: null,
 
   // --- Actions ---
 
-    // اکشن برای تنظیم وضعیت اولیه
+  // اکشن برای تنظیم وضعیت اولیه
   addPoints: (amount) => set((state) => ({ points: state.points + amount })),
 
-  // اکشن برای اعطای یک نشان جدید
   addBadge: (badgeId) =>
     set((state) => {
-      // فقط در صورتی نشان را اضافه کن که کاربر قبلاً آن را نداشته باشد
       if (!state.badges.includes(badgeId)) {
-        return { badges: [...state.badges, badgeId] };
+        return {
+          badges: [...state.badges, badgeId],
+          newlyAwardedBadge: badgeId,
+        };
       }
-      return state;
+      return { ...state, newlyAwardedBadge: null }; // اگر نشان تکراری بود، اعلان نشان نده
     }),
+
+  // اکشن برای پاک کردن اعلان پس از نمایش
+  clearNewBadge: () => set({ newlyAwardedBadge: null }),
 
   // اکشن برای مقداردهی اولیه یا بارگذاری وضعیت کاربر
   initialize: (userId, savedState) =>
