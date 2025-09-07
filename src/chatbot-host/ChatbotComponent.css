@@ -1,0 +1,7 @@
+/* src/chatbot-host-example/ChatbotComponent.css */
+.chatbot-container {
+  position: fixed;
+  bottom: 100px;
+  right: 100px;
+  z-index: 1000;
+}

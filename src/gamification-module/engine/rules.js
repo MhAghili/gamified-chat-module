@@ -1,38 +1,40 @@
-// src/gamification-module/engine/rules.js
-
-// لیستی از شناسه‌های نشان‌ها برای خوانایی بهتر
 export const BADGES = {
-  FIRST_STEP: "FIRST_STEP", // اولین تعامل
-  CURIOUS_EXPLORER: "CURIOUS_EXPLORER", // پرسیدن یک سوال خوب
+  FIRST_INTERACTION: "FIRST_INTERACTION",
+  INSIGHTFUL_QUESTION: "INSIGHTFUL_QUESTION",
+  KNOWLEDGE_SEEKER: "KNOWLEDGE_SEEKER",
 };
 
-// تعریف قوانین: هر رویداد به یک تابع نگاشت می‌شود
-// این تابع وضعیت فعلی و داده‌های رویداد را دریافت کرده و اکشن‌های لازم را فراخوانی می‌کند
 export const rules = {
-  INITIAL_INTERACTION: (state, actions) => {
-    // اگر این اولین تعامل کاربر است، به او امتیاز و نشان بده
-    if (state.points === 0) {
-      actions.addPoints(10);
-      actions.addBadge(BADGES.FIRST_STEP);
+  USER_INTERACTED: (getState, setState, payload) => {
+    const { points, addPoints, addBadge } = getState();
+    if (points === 0) {
+      addPoints(10);
+      addBadge(BADGES.FIRST_INTERACTION);
       console.log(
-        "Event: INITIAL_INTERACTION -> Awarded 10 points and FIRST_STEP badge."
+        "Event: USER_INTERACTED -> First interaction points awarded."
       );
     }
   },
 
-  ASKED_QUESTION: (state, actions, payload) => {
-    // قانونی برای مثال: اگر سوال شامل کلمه "چگونه" بود، امتیاز بیشتری بده
-    if (payload?.questionText?.includes("چگونه")) {
-      actions.addPoints(15);
-      actions.addBadge(BADGES.CURIOUS_EXPLORER);
-      console.log(
-        "Event: ASKED_QUESTION (insightful) -> Awarded 15 points and CURIOUS_EXPLORER badge."
-      );
+  USER_ASKED_QUESTION: (getState, setState, payload) => {
+    const { addPoints, addBadge } = getState();
+    const questionText = payload?.questionText || "";
+
+    if (questionText.includes("چگونه")) {
+      addPoints(15);
+      addBadge(BADGES.INSIGHTFUL_QUESTION);
+      console.log("Event: USER_ASKED_QUESTION (insightful) -> Points awarded.");
     } else {
-      actions.addPoints(5);
-      console.log("Event: ASKED_QUESTION -> Awarded 5 points.");
+      addPoints(5);
+      console.log("Event: USER_ASKED_QUESTION -> Points awarded.");
+    }
+
+    if (questionText.includes("راهنما")) {
+      addPoints(20);
+      addBadge(BADGES.KNOWLEDGE_SEEKER);
+      console.log(
+        "Event: USER_ASKED_QUESTION (knowledge seeker) -> Badge awarded."
+      );
     }
   },
-
-  // ... قوانین بیشتر در آینده اینجا اضافه می‌شوند
 };

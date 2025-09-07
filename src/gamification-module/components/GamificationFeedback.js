@@ -1,36 +1,45 @@
 // src/gamification-module/components/GamificationFeedback.js
-import React, { useEffect } from "react";
-import { gamificationAPI } from "../index"
+import React, { useEffect, useRef } from "react";
+import { gamificationAPI } from "../index";
 import BadgeNotification from "./BadgeNotification";
 import ScoreDisplay from "./ScoreDisplay";
 
 const GamificationFeedback = ({ triggerNextStep }) => {
-  // به نشان جدید و اکشن پاک کردن آن گوش می‌دهیم
   const { newBadge, clearNewBadge } = gamificationAPI.useStore((state) => ({
     newBadge: state.newlyAwardedBadge,
     clearNewBadge: state.clearNewBadge,
   }));
 
+  const hasTriggeredRef = useRef(false);
+
   useEffect(() => {
-    // وقتی کامپوننت نمایش داده شد، اگر نشانی وجود داشت،
-    // بعد از چند ثانیه به مرحله بعد می‌رویم و نشان را پاک می‌کنیم.
+    if (hasTriggeredRef.current) {
+      return;
+    }
+    debugger;
+
     if (newBadge) {
+      hasTriggeredRef.current = true;
       setTimeout(() => {
         clearNewBadge();
         triggerNextStep();
-      }, 3000); // ۳ ثانیه نمایش اعلان
+      }, 3000);
     } else {
-      // اگر نشان جدیدی نبود، بلافاصله به مرحله بعد برو
-      triggerNextStep();
+      hasTriggeredRef.current = true;
+      // این خط تغییر کرده است
+      // ما اجرا را به بعد از چرخه فعلی رندر منتقل می‌کنیم تا از حلقه جلوگیری کنیم
+      setTimeout(() => triggerNextStep(), 0);
     }
-  }, [newBadge, clearNewBadge, triggerNextStep]);
+  }, [newBadge, clearNewBadge, triggerNextStep]); // triggerNextStep را به آرایه وابستگی اضافه می‌کنیم
 
-  // اگر نشان جدیدی وجود دارد، آن را نمایش بده
   if (newBadge) {
-    return <BadgeNotification badgeId={newBadge} />;
+    return (
+      <div>
+        <BadgeNotification />
+      </div>
+    );
   }
 
-  // در غیر این صورت، امتیاز را نمایش بده
   return <ScoreDisplay />;
 };
 

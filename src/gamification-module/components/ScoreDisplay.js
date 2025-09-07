@@ -14,10 +14,13 @@ const ScoreWrapper = styled.div`
 `;
 
 const ScoreDisplay = () => {
-  // با استفاده از هوک useStore به وضعیت امتیازات گوش می‌دهیم
   const points = gamificationAPI.useStore((state) => state.points);
 
-  return <ScoreWrapper>✨ **امتیاز شما:** {points}</ScoreWrapper>;
+  return (
+    <ScoreWrapper>
+      ✨ <strong>امتیاز شما:</strong> {points}
+    </ScoreWrapper>
+  );
 };
 
 export default ScoreDisplay;

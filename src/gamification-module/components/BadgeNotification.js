@@ -1,6 +1,8 @@
-// src/gamification-module/components/BadgeNotification.js
+// src/chatbot/components/BadgeNotification.js
 import React from "react";
 import styled, { keyframes } from "styled-components";
+// API ماژول گیمیفیکیشن را وارد می‌کنیم
+import { gamificationAPI } from "../../gamification-module";
 
 const fadeIn = keyframes`
   from {
@@ -21,6 +23,7 @@ const BadgeWrapper = styled.div`
   margin: 5px;
   animation: ${fadeIn} 0.5s ease-out;
   font-family: Arial, sans-serif;
+  width: 200px; /* یک عرض ثابت برای ظاهر بهتر */
 `;
 
 const BadgeTitle = styled.h4`
@@ -33,19 +36,25 @@ const BadgeDescription = styled.p`
   font-size: 13px;
 `;
 
-// یک دیکشنری برای تعریف نام و توضیحات نشان‌ها
 const BADGE_DEFINITIONS = {
-  FIRST_STEP: {
+  FIRST_INTERACTION: {
     title: "🏆 اولین قدم!",
     description: "شما اولین تعامل خود را با موفقیت انجام دادید.",
   },
-  CURIOUS_EXPLORER: {
+  INSIGHTFUL_QUESTION: {
     title: "🏆 کاوشگر کنجکاو!",
     description: "شما یک سوال عالی پرسیدید و به دنبال دانش هستید.",
   },
+  KNOWLEDGE_SEEKER: {
+    title: "🎓 دانشجو!",
+    description: "شما به دنبال مطالعه راهنما و یادگیری بیشتر هستید. آفرین!",
+  },
 };
 
-const BadgeNotification = ({ badgeId }) => {
+const BadgeNotification = () => {
+  // این کامپوننت حالا خودش مستقیماً به store گوش می‌دهد
+  const badgeId = gamificationAPI.useStore((state) => state.newlyAwardedBadge);
+
   const badge = BADGE_DEFINITIONS[badgeId];
   if (!badge) return null;
 
