@@ -1,7 +1,8 @@
 // src/chatbot/config.js
 import { createChatBotMessage } from "react-chatbot-kit";
-import ScoreDisplay from "../gamification-module/components/ScoreDisplay";
 import BadgeNotification from "../gamification-module/components/BadgeNotification";
+// ۱. هدر سفارشی را وارد می‌کنیم
+import CustomHeader from "../gamification-module/components/CustomHeader";
 
 const config = {
   initialMessages: [
@@ -9,18 +10,16 @@ const config = {
       `سلام! به چت‌بات پشتیبانی خوش آمدید. لطفا نام خود را وارد کنید.`
     ),
   ],
-
-  // یک وضعیت برای مدیریت مراحل گفتگو اضافه می‌کنیم
+  botName: "پشتیبان گیمیفای‌شده",
   state: {
     conversationStage: "initial_greeting",
   },
-
-  // ویجت‌های سفارشی خود را به چت‌بات معرفی می‌کنیم
+  // ۲. یک پراپرتی جدید برای معرفی کامپوننت‌های سفارشی اضافه می‌کنیم
+  customComponents: {
+    // به کتابخانه می‌گوییم که کامپوننت 'header' را با کامپوننت ما جایگزین کن
+    header: (props) => <CustomHeader {...props} />,
+  },
   widgets: [
-    {
-      widgetName: "scoreDisplay",
-      widgetFunc: (props) => <ScoreDisplay {...props} />,
-    },
     {
       widgetName: "badgeNotification",
       widgetFunc: (props) => <BadgeNotification {...props} />,
