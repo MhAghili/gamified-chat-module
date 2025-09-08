@@ -17,6 +17,16 @@ if (!apiKey) {
 }
 const genAI = new GoogleGenerativeAI(apiKey);
 
+const conversations = {};
+
+function buildHistory(userId) {
+  const history = conversations[userId] || [];
+  return history.map((m) => ({
+    role: m.role === "user" ? "user" : "model",
+    parts: [{ text: m.text }],
+  }));
+}
+
 // پرامپت سیستمی به صورت یک رشته ساده تعریف می‌شود
 const systemInstruction = `
 شما یک دستیار هوشمند و متخصص در زمینه مهندسی نرم‌افزار هستید.
@@ -37,16 +47,23 @@ const model = genAI.getGenerativeModel({
 });
 
 app.post("/api/askAI", async (req, res) => {
-  const { question } = req.body;
+  const { userId, question } = req.body;
   if (!question || typeof question !== "string") {
     return res.status(400).json({ error: "Question is required" });
   }
 
   try {
     const chat = model.startChat();
-    const result = await chat.sendMessage(question);
-    const response = result.response;
-    const text = response.text();
+    // ۱. ساخت هیستوری قبلی + سوال جدید
+    const history = buildHistory(userId);
+    history.push({ role: "user", parts: [{ text: question }] });
+    const result = await model.generateContent({ contents: history });
+    const text = result?.response?.text?.() ?? "پاسخی دریافت نشد.";
+
+    // ۳. ذخیره در حافظه
+    if (!conversations[userId]) conversations[userId] = [];
+    conversations[userId].push({ role: "user", text: question });
+    conversations[userId].push({ role: "model", text });
     return res.json({ answer: text });
   } catch (err) {
     console.error("askAI error:", err);
