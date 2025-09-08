@@ -1,6 +1,6 @@
 // src/chatbot/components/BadgeNotification.js
 import React from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 
 // ... (بخش keyframes و styled-components بدون تغییر باقی می‌ماند)
 const BadgeWrapper = styled.div`

@@ -6,6 +6,7 @@ const initialState = {
   userId: null,
   points: 0,
   badges: [],
+  userName: null, // ۱. نام کاربر را به state اضافه کردیم
   newlyAwardedBadge: null, // این وضعیت نباید ذخیره شود
 };
 
@@ -15,6 +16,7 @@ export const useGameStore = create(
       ...initialState,
 
       // --- Actions ---
+      setUserName: (name) => set({ userName: name }),
       addPoints: (amount) =>
         set((state) => ({ points: state.points + amount })),
 
@@ -45,6 +47,7 @@ export const useGameStore = create(
       partialize: (state) => ({
         points: state.points,
         badges: state.badges,
+        userName: state.userName,
       }),
     }
   )

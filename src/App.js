@@ -3,12 +3,22 @@ import React, { useState, useEffect } from "react";
 import { gamificationAPI } from "./gamification-module";
 import ChatbotComponent from "./chatbot-host/ChatbotComponent";
 
+const getOrSetUserId = () => {
+  let userId = localStorage.getItem("chatbot_user_id");
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem("chatbot_user_id", userId);
+  }
+  return userId;
+};
+
 const App = () => {
   // یک state برای مدیریت باز و بسته بودن چت‌بات
   const [showChatbot, setShowChatbot] = useState(false);
 
   useEffect(() => {
-    gamificationAPI.init("user-123");
+    const userId = getOrSetUserId();
+    gamificationAPI.init(userId); // ماژول را با userId دینامیک راه‌اندازی می‌کنیم
   }, []);
 
   const toggleChatbot = () => {
