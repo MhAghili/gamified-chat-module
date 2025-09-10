@@ -6,6 +6,7 @@ import styled from "styled-components";
 const BadgeWrapper = styled.div`
   background-color: #ffd700;
   color: #333;
+  font-family: "MyPersianFont", sans-serif;
   padding: 12px;
   border-radius: 8px;
   margin: 5px;
@@ -16,10 +17,12 @@ const BadgeWrapper = styled.div`
 const BadgeTitle = styled.h4`
   margin: 0 0 5px 0;
   font-size: 16px;
+  font-family: "MyPersianFont", sans-serif;
 `;
 const BadgeDescription = styled.p`
   margin: 0;
   font-size: 13px;
+  font-family: "MyPersianFont", sans-serif;
 `;
 
 const BADGE_DEFINITIONS = {
@@ -34,6 +37,14 @@ const BADGE_DEFINITIONS = {
   KNOWLEDGE_SEEKER: {
     title: "🎓 دانشجو!",
     description: "شما به دنبال مطالعه راهنما و یادگیری بیشتر هستید. آفرین!",
+  },
+    CODE_SHARER: {
+    title: "💻 کدنویس!",
+    description: "شما برای حل مشکل، یک قطعه کد به اشتراک گذاشتید.",
+  },
+  CURIOUS_STREAK: {
+    title: "🔥 کنجکاو پیگیر!",
+    description: "شما ۳ سوال پشت سر هم پرسیدید و عطش یادگیری دارید.",
   },
 };
 

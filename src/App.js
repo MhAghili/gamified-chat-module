@@ -27,18 +27,15 @@ const App = () => {
 
   return (
     <div>
-      <header style={{ padding: "20px", backgroundColor: "#eee" }}>
+      <header style={{ padding: "20px", direction:"rtl", backgroundColor: "#eee" }}>
         <h1>پروژه چت‌بات گیمیفای‌شده</h1>
         <p>روی آیکون چت در پایین صفحه کلیک کنید.</p>
       </header>
 
-      {/* دکمه شناور برای باز و بسته کردن چت‌بات */}
       <button onClick={toggleChatbot} style={styles.floatingButton}>
-        {/* می‌توانید از یک عکس آیکون استفاده کنید */}
         💬
       </button>
 
-      {/* چت‌بات فقط زمانی نمایش داده می‌شود که showChatbot برابر true باشد */}
       {showChatbot && (
         <div style={styles.chatbotWrapper}>
           <ChatbotComponent />

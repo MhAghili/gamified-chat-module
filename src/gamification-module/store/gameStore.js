@@ -8,6 +8,8 @@ const initialState = {
   badges: [],
   userName: null, // ۱. نام کاربر را به state اضافه کردیم
   newlyAwardedBadge: null, // این وضعیت نباید ذخیره شود
+  questionStreak: 0,
+  lastQuestionTimestamp: null, // <-- این خط را اضافه کن
 };
 
 export const useGameStore = create(
@@ -33,6 +35,14 @@ export const useGameStore = create(
 
       clearNewBadge: () => set({ newlyAwardedBadge: null }),
 
+      incrementStreak: () =>
+        set((state) => ({
+          questionStreak: state.questionStreak + 1,
+          lastQuestionTimestamp: Date.now(), // <-- زمان را هم ثبت می‌کنیم
+        })),
+      resetStreak: () =>
+        set({ questionStreak: 1, lastQuestionTimestamp: Date.now() }), // <-- ریست به ۱
+
       initialize: (userId) =>
         set({
           isInitialized: true,
@@ -48,6 +58,8 @@ export const useGameStore = create(
         points: state.points,
         badges: state.badges,
         userName: state.userName,
+        questionStreak: state.questionStreak,
+        lastQuestionTimestamp: state.lastQuestionTimestamp,
       }),
     }
   )

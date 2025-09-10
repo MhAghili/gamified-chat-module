@@ -4,7 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const PORT = 5000;
+const PORT = 3001;
 const app = express();
 
 app.use(cors());
@@ -44,6 +44,10 @@ const systemInstruction = `
 const model = genAI.getGenerativeModel({
   model: "gemini-2.0-flash", // اصلاح نام مدل
   systemInstruction: systemInstruction, // اصلاح ساختار پرامپت
+});
+// یک روت تست برای اطمینان از کار کردن سرور
+app.get("/", (req, res) => {
+  res.send("Server is alive and running!");
 });
 
 app.post("/api/askAI", async (req, res) => {

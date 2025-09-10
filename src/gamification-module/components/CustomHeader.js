@@ -6,6 +6,7 @@ import { gamificationAPI } from "../../gamification-module";
 const HeaderWrapper = styled.div`
   background-color: #6e48aa;
   color: white;
+  font-family: "MyPersianFont", sans-serif;
   padding: 12px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
@@ -18,12 +19,14 @@ const HeaderWrapper = styled.div`
 const HeaderTitle = styled.h2`
   margin: 0;
   font-size: 16px;
+  font-family: "MyPersianFont", sans-serif;
   font-weight: bold;
 `;
 
 const ScoreContainer = styled.div`
   font-size: 14px;
   font-weight: bold;
+  font-family: "MyPersianFont", sans-serif;
   background-color: rgba(255, 255, 255, 0.2);
   padding: 4px 8px;
   border-radius: 12px;

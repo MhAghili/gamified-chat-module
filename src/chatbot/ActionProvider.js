@@ -26,7 +26,7 @@ class ActionProvider {
     try {
       const { userId } = gamificationAPI.useStore.getState();
       debugger;
-      const response = await fetch("http://localhost:5000/api/askAI", {
+      const response = await fetch("http://localhost:3001/api/askAI", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, question: message }),
