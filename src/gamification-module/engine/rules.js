@@ -1,4 +1,3 @@
-// src/gamification-module/engine/rules.js
 
 export const BADGES = {
   FIRST_INTERACTION: "FIRST_INTERACTION",
@@ -8,7 +7,6 @@ export const BADGES = {
   CURIOUS_STREAK: "CURIOUS_STREAK",
 };
 
-// لیست کلمات کلیدی برای تشخیص بهتر
 const INSIGHTFUL_KEYWORDS = [
   "چگونه",
   "چرا",
@@ -34,8 +32,8 @@ const KNOWLEDGE_KEYWORDS = [
   "منبع",
   "مقاله",
 ];
-const STREAK_THRESHOLD = 3; // تعداد سوالات لازم برای بج Streak
-const STREAK_TIMEOUT_MS = 10 * 60 * 1000; // ۱۰ دقیقه
+const STREAK_THRESHOLD = 3; 
+const STREAK_TIMEOUT_MS = 10 * 60 * 1000; 
 
 export const rules = {
   USER_INTERACTED: (getState) => {
@@ -56,9 +54,7 @@ export const rules = {
       lastQuestionTimestamp,
     } = getState();
     const questionText = payload?.questionText?.toLowerCase() || "";
-    let awardedPoints = 5; // امتیاز پایه برای هر سوال
-
-    // ۱. منطق پیشرفته برای تشخیص سوال عمیق
+    let awardedPoints = 5; 
     if (
       INSIGHTFUL_KEYWORDS.some((keyword) => questionText.includes(keyword)) ||
       questionText.length > 50
@@ -67,19 +63,16 @@ export const rules = {
       addBadge(BADGES.INSIGHTFUL_QUESTION);
     }
 
-    // ۲. منطق پیشرفته برای تشخیص جستجوی دانش
     if (KNOWLEDGE_KEYWORDS.some((keyword) => questionText.includes(keyword))) {
       awardedPoints += 10;
       addBadge(BADGES.KNOWLEDGE_SEEKER);
     }
 
-    // ۳. منطق تشخیص قطعه کد (همچنان قوی است)
     if (questionText.includes("```")) {
       awardedPoints += 25;
       addBadge(BADGES.CODE_SHARER);
     }
 
-    // ۴. منطق پیشرفته برای Streak (سوالات متوالی)
     const now = Date.now();
     if (
       lastQuestionTimestamp &&
@@ -91,11 +84,9 @@ export const rules = {
         addBadge(BADGES.CURIOUS_STREAK);
       }
     } else {
-      // اگر زمان زیادی گذشته یا اولین سوال است، Streak ریست می‌شود
       resetStreak();
     }
 
-    // در نهایت، امتیاز محاسبه شده را اضافه می‌کنیم
     addPoints(awardedPoints);
   },
 };

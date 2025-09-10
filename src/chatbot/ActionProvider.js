@@ -2,11 +2,15 @@
 import { gamificationAPI } from "../gamification-module";
 import { gameQuestions } from "./gameQuestions";
 
+export const actionProviderRef = { current: null };
+
 const MAX_GAME_QUESTIONS = 5;
 class ActionProvider {
   constructor(createChatBotMessage, setStateFunc) {
     this.createChatBotMessage = createChatBotMessage;
     this.setState = setStateFunc;
+
+    actionProviderRef.current = this;
   }
 
   handleNameInput = async (name) => {
@@ -18,7 +22,6 @@ class ActionProvider {
     this.addMessageToState(thinkingMessage);
 
     try {
-      // ۳. درخواست را به endpoint جدید سرور ارسال می‌کنیم
       const response = await fetch(
         "http://localhost:3001/api/getWelcomeMessage",
         {
@@ -36,19 +39,16 @@ class ActionProvider {
       const aiWelcomeMessage = this.createChatBotMessage(data.welcomeMessage);
       this.addMessageToState(aiWelcomeMessage);
     } catch (error) {
-      // در صورت بروز خطا، یک پیام پیش‌فرض نمایش می‌دهیم
       const errorMessage = this.createChatBotMessage(
         `خوش آمدی ${name}! هر سوالی داری از من بپرس.`
       );
       this.addMessageToState(errorMessage);
     }
 
-    // ۴. مرحله گفتگو را تغییر داده و بازخورد گیمیفیکیشن (بج) را نمایش می‌دهیم
     this.setConversationStage("asking_questions");
     this.sendGamificationFeedback();
   };
 
-  // این تابع اکنون هوشمند می‌شود
   handleUserQuestion = async (message) => {
     const thinkingMessage = this.createChatBotMessage("در حال فکر کردن...");
     this.addMessageToState(thinkingMessage);
@@ -75,7 +75,6 @@ class ActionProvider {
       this.addMessageToState(errorMessage);
     }
 
-    // ۳. بعد از دریافت پاسخ، منطق گیمیفیکیشن را مثل قبل اجرا می‌کنیم
     gamificationAPI.triggerEvent("USER_ASKED_QUESTION", {
       questionText: message,
     });
@@ -83,11 +82,57 @@ class ActionProvider {
   };
 
   handleStartGame = () => {
-    const startGameMessage = this.createChatBotMessage(
-      "بازی شروع شد! حدس بزن اصطلاح فنی چیست."
+    const gameChoice = Math.random() < 0.5 ? "quiz" : "rps";
+
+    if (gameChoice === "quiz") {
+      const { startGame } = gamificationAPI.useStore.getState();
+      const randomIndex = Math.floor(Math.random() * gameQuestions.length);
+      const { question, answer } = gameQuestions[randomIndex];
+      startGame(question, answer.toLowerCase());
+      const gameMessage = this.createChatBotMessage(
+        `بسیار خب، بازی کوییز! سوال اینه: ${question}`
+      );
+      this.addMessageToState(gameMessage);
+    } else {
+      const gameMessage = this.createChatBotMessage(
+        "بازی سنگ، کاغذ، قیچی! انتخابت رو بکن:",
+        {
+          widget: "rockPaperScissors",
+        }
+      );
+      this.addMessageToState(gameMessage);
+    }
+  };
+
+  handleRpsChoice = (userChoice) => {
+    const choices = ["rock", "paper", "scissors"];
+    const choiceMap = { rock: "سنگ ✊", paper: "کاغذ 🖐️", scissors: "قیچی ✌️" };
+    const botChoice = choices[Math.floor(Math.random() * choices.length)];
+    const { addPoints } = gamificationAPI.useStore.getState();
+    let resultMessage = "";
+    let pointsAwarded = 0;
+    debugger;
+    if (userChoice === botChoice) {
+      resultMessage = `مساوی شد! هر دو ${choiceMap[userChoice]} رو انتخاب کردیم.`;
+    } else if (
+      (userChoice === "rock" && botChoice === "scissors") ||
+      (userChoice === "scissors" && botChoice === "paper") ||
+      (userChoice === "paper" && botChoice === "rock")
+    ) {
+      pointsAwarded = 25;
+      resultMessage = `تو بردی! من ${choiceMap[botChoice]} و تو ${choiceMap[userChoice]} رو انتخاب کردی. ${pointsAwarded} امتیاز گرفتی!`;
+      addPoints(pointsAwarded);
+    } else {
+      resultMessage = `من بردم! من ${choiceMap[botChoice]} و تو ${choiceMap[userChoice]} رو انتخاب کردی. امتیازی نگرفتی.`;
+    }
+
+    const finalMessage = this.createChatBotMessage(resultMessage);
+    this.addMessageToState(finalMessage);
+
+    const continueMessage = this.createChatBotMessage(
+      "اگر سوالی داری بپرس یا دوباره بازی کنیم!"
     );
-    this.addMessageToState(startGameMessage);
-    this.askNewGameQuestion();
+    setTimeout(() => this.addMessageToState(continueMessage), 1500);
   };
 
   handleGameAnswer = (userAnswer) => {
@@ -110,14 +155,11 @@ class ActionProvider {
 
     incrementQuestionsAsked();
 
-    // چک می‌کنیم آیا بازی باید ادامه پیدا کند
 
     var { questionsAsked } = gamificationAPI.useStore.getState().game;
     if (questionsAsked < MAX_GAME_QUESTIONS) {
-      // اگر هنوز به حدنصاب نرسیده‌ایم، سوال بعدی را می‌پرسیم
       setTimeout(() => this.askNewGameQuestion(), 1500);
     } else {
-      // اگر ۵ سوال پرسیده شد، بازی را تمام می‌کنیم
       const endMessage = this.createChatBotMessage(
         "بازی تموم شد! برای ۵ سوال عالی بود. امیدوارم لذت برده باشی."
       );
@@ -126,7 +168,6 @@ class ActionProvider {
     }
   };
 
-  // این تابع جدید و کلیدی را اضافه کن
   askNewGameQuestion = () => {
     const { startGame } = gamificationAPI.useStore.getState();
     const randomIndex = Math.floor(Math.random() * gameQuestions.length);
@@ -140,7 +181,7 @@ class ActionProvider {
 
   handleEndGameCommand = () => {
     const { endGame } = gamificationAPI.useStore.getState();
-    endGame(); // وضعیت بازی را در store ریست می‌کنیم
+    endGame(); 
 
     const endMessage = this.createChatBotMessage(
       "باشه، بازی تموم شد. حالا می‌تونیم به گفتگوی فنی ادامه بدیم."
@@ -153,24 +194,31 @@ class ActionProvider {
       gamificationAPI.useStore.getState();
 
     if (newlyAwardedBadge) {
-      // اگر بج جدیدی کسب شده بود، ویجت بج را با payload ارسال می‌کنیم
       const badgeMessage = this.createChatBotMessage(
         "یک دستاورد جدید کسب کردی!",
         {
           widget: "badgeNotification",
-          // ما اطلاعات بج را مستقیماً به پیام پاس می‌دهیم
           payload: { badgeId: newlyAwardedBadge },
         }
       );
       this.addMessageToState(badgeMessage);
 
-      // تمام منطق پاک کردن بج به اینجا منتقل می‌شود
-      // بعد از ۴ ثانیه، بج را از state پاک می‌کنیم
+
       setTimeout(() => {
         clearNewBadge();
       }, 4000);
     } else {
     }
+  };
+
+  handleShowBadges = () => {
+    const badgesMessage = this.createChatBotMessage(
+      "این‌ها دستاوردهایی هست که تا الان کسب کردی:",
+      {
+        widget: "badgeList",
+      }
+    );
+    this.addMessageToState(badgesMessage);
   };
 
   addMessageToState = (message) => {

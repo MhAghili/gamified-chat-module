@@ -1,4 +1,3 @@
-// src/gamification-module/components/EventTrigger.js
 import { useEffect, useRef } from "react";
 import { gamificationAPI } from "..";
 
@@ -11,7 +10,6 @@ const EventTrigger = ({ triggerNextStep, eventName, payload }) => {
         gamificationAPI.triggerEvent(eventName, payload);
       }
       hasTriggeredRef.current = true;
-      // اجرای مرحله بعدی را به انتهای چرخه رندر منتقل کن تا از حلقه جلوگیری شود
       setTimeout(() => {
         if (triggerNextStep) triggerNextStep();
       }, 0);

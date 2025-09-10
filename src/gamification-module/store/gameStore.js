@@ -1,20 +1,19 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
 const initialState = {
   isInitialized: false,
   userId: null,
   points: 0,
   badges: [],
-  userName: null, // ۱. نام کاربر را به state اضافه کردیم
-  newlyAwardedBadge: null, // این وضعیت نباید ذخیره شود
+  userName: null,
+  newlyAwardedBadge: null,
   questionStreak: 0,
-  lastQuestionTimestamp: null, // <-- این خط را اضافه کن
+  lastQuestionTimestamp: null,
   game: {
     isActive: false,
     question: null,
     answer: null,
-    questionsAsked: 0, // <-- این شمارنده را اضافه کن
+    questionsAsked: 0,
   },
 };
 
@@ -44,7 +43,7 @@ export const useGameStore = create(
       incrementStreak: () =>
         set((state) => ({
           questionStreak: state.questionStreak + 1,
-          lastQuestionTimestamp: Date.now(), // <-- زمان را هم ثبت می‌کنیم
+          lastQuestionTimestamp: Date.now(),
         })),
 
       startGame: (question, answer) =>
@@ -54,10 +53,8 @@ export const useGameStore = create(
             isActive: true,
             question,
             answer,
-            // questionsAsked: state.game.questionsAsked, // not needed, ...state.game keeps it
           },
         })),
-      // این اکشن جدید را اضافه کن
       incrementQuestionsAsked: () =>
         set((state) => ({
           game: {
@@ -72,7 +69,7 @@ export const useGameStore = create(
         })),
 
       resetStreak: () =>
-        set({ questionStreak: 1, lastQuestionTimestamp: Date.now() }), // <-- ریست به ۱
+        set({ questionStreak: 1, lastQuestionTimestamp: Date.now() }),
 
       initialize: (userId) =>
         set({
@@ -83,8 +80,7 @@ export const useGameStore = create(
       reset: () => set((state) => ({ ...initialState, userId: state.userId })),
     }),
     {
-      name: "gamification-storage", // نام کلید در localStorage
-      // ما فقط می‌خواهیم امتیاز و نشان‌ها ذخیره شوند
+      name: "gamification-storage", // localStorage
       partialize: (state) => ({
         points: state.points,
         badges: state.badges,

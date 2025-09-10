@@ -13,12 +13,11 @@ const getOrSetUserId = () => {
 };
 
 const App = () => {
-  // یک state برای مدیریت باز و بسته بودن چت‌بات
   const [showChatbot, setShowChatbot] = useState(false);
 
   useEffect(() => {
     const userId = getOrSetUserId();
-    gamificationAPI.init(userId); // ماژول را با userId دینامیک راه‌اندازی می‌کنیم
+    gamificationAPI.init(userId);
   }, []);
 
   const toggleChatbot = () => {
@@ -45,7 +44,6 @@ const App = () => {
   );
 };
 
-// استایل‌های دکمه و پنجره شناور
 const styles = {
   chatbotWrapper: {
     position: "fixed",

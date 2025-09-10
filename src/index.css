@@ -1,8 +1,6 @@
-/* src/index.css */
 
 @font-face {
   font-family: "MyPersianFont";
-  /* مطمئن شو که مسیر فایل فونت درست است */
   src: url("./Fonts/IRANSansXFaNum-Regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
@@ -17,4 +15,3 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* بقیه کدهای index.css ... */

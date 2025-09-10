@@ -1,20 +1,24 @@
-// src/chatbot/config.js
 import { createChatBotMessage } from "react-chatbot-kit";
 import BadgeNotification from "../gamification-module/components/BadgeNotification";
 import CustomHeader from "../gamification-module/components/CustomHeader";
+import BadgeList from "../gamification-module/components/BadgeList";
+import OptionsWidget from "../gamification-module/components/OptionsWidget";
+import RockPaperScissors from "../gamification-module/components/RockPaperScissors";
 
 import { gamificationAPI } from "../gamification-module";
 
-// به جای یک آبجکت، یک تابع می‌سازیم
 const createChatbotConfig = () => {
-  // ۲. قبل از ساختن تنظیمات، نام کاربر را از store می‌خوانیم
   const { userName } = gamificationAPI.useStore.getState();
 
-  // ۳. بر اساس وجود نام، پیام و مرحله اولیه را تعیین می‌کنیم
   const initialMessages = userName
     ? [
         createChatBotMessage(
-          `سلام ${userName}، خوش برگشتی! هر سوالی داری بپرس.`
+          `سلام ${userName}، خوش برگشتی! چه کاری می‌تونم برات انجام بدم؟` +
+            "\n" +
+            `هر سوالی داری برام تایپ کن`,
+          {
+            widget: "optionsWidget",
+          }
         ),
       ]
     : [
@@ -38,6 +42,18 @@ const createChatbotConfig = () => {
       {
         widgetName: "badgeNotification",
         widgetFunc: (props) => <BadgeNotification {...props} />,
+      },
+      {
+        widgetName: "badgeList",
+        widgetFunc: (props) => <BadgeList {...props} />,
+      },
+      {
+        widgetName: "optionsWidget",
+        widgetFunc: (props) => <OptionsWidget {...props} />,
+      },
+      {
+        widgetName: "rockPaperScissors",
+        widgetFunc: (props) => <RockPaperScissors {...props} />,
       },
     ],
   };

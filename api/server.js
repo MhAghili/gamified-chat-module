@@ -8,7 +8,7 @@ const PORT = 3001;
 const app = express();
 
 app.use(cors());
-app.use(express.json()); // بهتر از bodyParser است
+app.use(express.json()); 
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
@@ -27,8 +27,6 @@ function buildHistory(userId) {
   }));
 }
 
-// پرامپت سیستمی به صورت یک رشته ساده تعریف می‌شود
-// api/server.js
 const systemInstruction = `
 شما یک دستیار هوشمند و متخصص در زمینه مهندسی نرم‌افزار به نام 'پشتیبان گیمیفای‌شده' هستی.
 شما در محیط یک پروژه کارشناسی با موضوع گیمیفیکیشن فعالیت می‌کنی و لحن شما باید دوستانه، دلگرم‌کننده و کمی غیررسمی باشد.
@@ -52,12 +50,10 @@ const systemInstruction = `
 4.  **پاسخ‌های کوتاه:** پاسخ‌هایت را تا حد امکان کوتاه، مفید و مرحله به مرحله نگه دار.
 `;
 
-// مدل فقط یک بار ساخته می‌شود تا بهینه‌تر باشد
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash", // اصلاح نام مدل
-  systemInstruction: systemInstruction, // اصلاح ساختار پرامپت
+  model: "gemini-2.0-flash",
+  systemInstruction: systemInstruction,
 });
-// یک روت تست برای اطمینان از کار کردن سرور
 app.get("/", (req, res) => {
   res.send("Server is alive and running!");
 });
@@ -70,13 +66,11 @@ app.post("/api/askAI", async (req, res) => {
 
   try {
     const chat = model.startChat();
-    // ۱. ساخت هیستوری قبلی + سوال جدید
     const history = buildHistory(userId);
     history.push({ role: "user", parts: [{ text: question }] });
     const result = await model.generateContent({ contents: history });
     const text = result?.response?.text?.() ?? "پاسخی دریافت نشد.";
 
-    // ۳. ذخیره در حافظه
     if (!conversations[userId]) conversations[userId] = [];
     conversations[userId].push({ role: "user", text: question });
     conversations[userId].push({ role: "model", text });
@@ -89,7 +83,6 @@ app.post("/api/askAI", async (req, res) => {
   }
 });
 
-// --- این endpoint جدید را اضافه کن ---
 app.post("/api/getWelcomeMessage", async (req, res) => {
   const { userName } = req.body;
 
@@ -97,11 +90,10 @@ app.post("/api/getWelcomeMessage", async (req, res) => {
     return res.status(400).json({ error: "userName is required" });
   }
 
-  // پرامپت اختصاصی برای تولید پیام خوشامدگویی
   const welcomePrompt = `
     شما یک دستیار هوشمند و بسیار دوستانه به نام 'پشتیبان گیمیفای‌شده' هستی.
     یک کاربر جدید به نام '${userName}' به تازگی وارد شده است.
-    وظیفه شما این است که در دو یا سه پاراگراف کوتاه، یک پیام خوشامدگویی بسیار گرم و جذاب برای او بنویسی.
+    وظیفه شما این است که در دو پاراگراف کوتاه، یک پیام خوشامدگویی بسیار گرم و جذاب برای او بنویسی.
     در این پیام باید به موارد زیر اشاره کنی:
     1.  به او با نام خودش خوشامد بگو.
     2.  توضیح بده که اینجا یک محیط یادگیری برای مباحث نرم‌افزار است و تو برای پاسخ به سوالات فنی او اینجا هستی.
@@ -112,7 +104,6 @@ app.post("/api/getWelcomeMessage", async (req, res) => {
   `;
 
   try {
-    // ما از همان مدل اصلی استفاده می‌کنیم اما با پرامپت متفاوت
     const result = await model.generateContent(welcomePrompt);
     const text = result?.response?.text?.() ?? "به پروژه گیمیفای‌شده خوش آمدی!";
 

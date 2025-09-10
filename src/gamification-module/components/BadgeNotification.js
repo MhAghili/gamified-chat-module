@@ -1,8 +1,6 @@
-// src/chatbot/components/BadgeNotification.js
 import React from "react";
 import styled from "styled-components";
 
-// ... (بخش keyframes و styled-components بدون تغییر باقی می‌ماند)
 const BadgeWrapper = styled.div`
   background-color: #ffd700;
   color: #333;
@@ -48,7 +46,6 @@ const BADGE_DEFINITIONS = {
   },
 };
 
-// این کامپوننت حالا کاملا ساده است و اطلاعات را از props می‌خواند
 const BadgeNotification = (props) => {
   const { badgeId } = props.payload;
   const badge = BADGE_DEFINITIONS[badgeId];
