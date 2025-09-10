@@ -9,7 +9,6 @@ export const gamificationAPI = {
 
   triggerEvent: (eventName, payload) => {
     const { getState, setState } = useGameStore;
-    debugger;
 
     if (rules[eventName]) {
       rules[eventName](getState, setState, payload);

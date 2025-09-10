@@ -16,7 +16,6 @@ const GamificationFeedback = ({ triggerNextStep }) => {
     if (hasTriggeredRef.current) {
       return;
     }
-    debugger;
 
     if (newBadge) {
       hasTriggeredRef.current = true;
