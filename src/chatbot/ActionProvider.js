@@ -4,6 +4,12 @@ import { gameQuestions } from "./gameQuestions";
 
 export const actionProviderRef = { current: null };
 
+const rewards = [
+  { id: "microservices", name: "توضیح معماری میکروسرویس", cost: 150 },
+  { id: "sql_vs_nosql", name: "مقایسه SQL و NoSQL", cost: 200 },
+  { id: "dijkstra", name: "آموزش الگوریتم Dijkstra", cost: 250 },
+];
+
 const MAX_GAME_QUESTIONS = 5;
 class ActionProvider {
   constructor(createChatBotMessage, setStateFunc) {
@@ -82,7 +88,8 @@ class ActionProvider {
   };
 
   handleStartGame = () => {
-    const gameChoice = Math.random() < 0.5 ? "quiz" : "rps";
+    const games = ["quiz", "rps", "tictactoe"];
+    const gameChoice = games[Math.floor(Math.random() * games.length)];
 
     if (gameChoice === "quiz") {
       const { startGame } = gamificationAPI.useStore.getState();
@@ -93,7 +100,7 @@ class ActionProvider {
         `بسیار خب، بازی کوییز! سوال اینه: ${question}`
       );
       this.addMessageToState(gameMessage);
-    } else {
+    } else if (gameChoice === "rps") {
       const gameMessage = this.createChatBotMessage(
         "بازی سنگ، کاغذ، قیچی! انتخابت رو بکن:",
         {
@@ -101,7 +108,38 @@ class ActionProvider {
         }
       );
       this.addMessageToState(gameMessage);
+    } else {
+      // بازی دوز
+      const gameMessage = this.createChatBotMessage(
+        "بازی دوز! شما X هستید. اولین حرکت با شماست.",
+        {
+          widget: "ticTacToe",
+        }
+      );
+      this.addMessageToState(gameMessage);
     }
+  };
+
+  handleGameResult = (result) => {
+    const { addPoints } = gamificationAPI.useStore.getState();
+    let resultMessage = "";
+
+    if (result.winner === "X") {
+      resultMessage = "عالیه، تو بردی! 75 امتیاز ویژه گرفتی.";
+      addPoints(75);
+    } else if (result.winner === "O") {
+      resultMessage = "من بردم! بیشتر تلاش کن.";
+    } else {
+      resultMessage = "مساوی شدیم! بازی خوبی بود.";
+    }
+
+    const finalMessage = this.createChatBotMessage(resultMessage);
+    this.addMessageToState(finalMessage);
+
+    const continueMessage = this.createChatBotMessage(
+      "اگر سوالی داری بپرس یا دوباره بازی کنیم!"
+    );
+    setTimeout(() => this.addMessageToState(continueMessage), 1500);
   };
 
   handleRpsChoice = (userChoice) => {
@@ -155,7 +193,6 @@ class ActionProvider {
 
     incrementQuestionsAsked();
 
-
     var { questionsAsked } = gamificationAPI.useStore.getState().game;
     if (questionsAsked < MAX_GAME_QUESTIONS) {
       setTimeout(() => this.askNewGameQuestion(), 1500);
@@ -181,7 +218,7 @@ class ActionProvider {
 
   handleEndGameCommand = () => {
     const { endGame } = gamificationAPI.useStore.getState();
-    endGame(); 
+    endGame();
 
     const endMessage = this.createChatBotMessage(
       "باشه، بازی تموم شد. حالا می‌تونیم به گفتگوی فنی ادامه بدیم."
@@ -203,7 +240,6 @@ class ActionProvider {
       );
       this.addMessageToState(badgeMessage);
 
-
       setTimeout(() => {
         clearNewBadge();
       }, 4000);
@@ -219,6 +255,68 @@ class ActionProvider {
       }
     );
     this.addMessageToState(badgesMessage);
+  };
+
+  handleShowShop = () => {
+    const { points, unlockedContent } = gamificationAPI.useStore.getState();
+    debugger;
+    const rewardOptions = rewards.map((reward) => ({
+      text: `${reward.name} (${reward.cost} امتیاز) ${
+        unlockedContent.includes(reward.id) ? "✓" : ""
+      }`,
+      handler: () => this.handlePurchase(reward.id),
+      disabled: unlockedContent.includes(reward.id) || points < reward.cost,
+      id: reward.id,
+    }));
+
+    const shopMessage = this.createChatBotMessage(
+      `به فروشگاه محتوای ویژه خوش آمدی! امتیاز فعلی شما: ${points}`,
+      {
+        widget: "optionsWidget",
+        payload: { options: rewardOptions },
+      }
+    );
+    this.addMessageToState(shopMessage);
+  };
+
+  handlePurchase = async (rewardId) => {
+    const reward = rewards.find((r) => r.id === rewardId);
+    const { points, spendPoints, addUnlockedContent } =
+      gamificationAPI.useStore.getState();
+
+    if (points >= reward.cost) {
+      spendPoints(reward.cost);
+      addUnlockedContent(reward.id);
+
+      const thinkingMessage = this.createChatBotMessage(
+        "عالیه! در حال آماده کردن محتوای ویژه برای شما..."
+      );
+      this.addMessageToState(thinkingMessage);
+
+      try {
+        const response = await fetch(
+          "http://localhost:3001/api/getSpecialContent",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ topicId: rewardId }),
+          }
+        );
+        const data = await response.json();
+        const contentMessage = this.createChatBotMessage(data.content);
+        this.addMessageToState(contentMessage);
+      } catch (error) {
+        this.addMessageToState(
+          this.createChatBotMessage("متاسفانه مشکلی پیش آمد.")
+        );
+      }
+    } else {
+      // این حالت به دلیل disabled بودن دکمه نباید اتفاق بیفتد، اما برای اطمینان است
+      const sorryMessage = this.createChatBotMessage(
+        "متاسفانه امتیازت کافی نیست."
+      );
+      this.addMessageToState(sorryMessage);
+    }
   };
 
   addMessageToState = (message) => {

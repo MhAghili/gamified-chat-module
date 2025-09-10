@@ -4,6 +4,7 @@ import CustomHeader from "../gamification-module/components/CustomHeader";
 import BadgeList from "../gamification-module/components/BadgeList";
 import OptionsWidget from "../gamification-module/components/OptionsWidget";
 import RockPaperScissors from "../gamification-module/components/RockPaperScissors";
+import TicTacToe from "../gamification-module/components/TicTacToe";
 
 import { gamificationAPI } from "../gamification-module";
 
@@ -12,13 +13,13 @@ const createChatbotConfig = () => {
 
   const initialMessages = userName
     ? [
+        createChatBotMessage(`سلام خوش برگشتی ${userName}`, {
+          widget: "optionsWidget",
+        }),
         createChatBotMessage(
-          `سلام ${userName}، خوش برگشتی! چه کاری می‌تونم برات انجام بدم؟` +
+          `چه کاری می‌تونم برات انجام بدم؟` +
             "\n" +
-            `هر سوالی داری برام تایپ کن`,
-          {
-            widget: "optionsWidget",
-          }
+            `هر سوالی داری برام تایپ کن`
         ),
       ]
     : [
@@ -54,6 +55,10 @@ const createChatbotConfig = () => {
       {
         widgetName: "rockPaperScissors",
         widgetFunc: (props) => <RockPaperScissors {...props} />,
+      },
+      {
+        widgetName: "ticTacToe",
+        widgetFunc: (props) => <TicTacToe {...props} />,
       },
     ],
   };

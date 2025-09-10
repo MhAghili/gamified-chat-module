@@ -1,5 +1,4 @@
 // src/chatbot/components/OptionsWidget.js
-import React from "react";
 import styled from "styled-components";
 
 const OptionsWrapper = styled.div`
@@ -24,11 +23,21 @@ const OptionButton = styled.button`
 `;
 
 const OptionsWidget = (props) => {
-  const options = [
+  const options = props.payload?.options || [
     {
       text: "🏆 دستاوردهای من",
-      handler: props.actionProvider.handleShowBadges, 
+      handler: props.actionProvider.handleShowBadges,
       id: 1,
+    },
+    {
+      text: "🎮 بازی",
+      handler: props.actionProvider.handleStartGame,
+      id: 2,
+    },
+    {
+      text: "🛒 فروشگاه",
+      handler: props.actionProvider.handleShowShop,
+      id: 3,
     },
   ];
 

@@ -15,6 +15,7 @@ const initialState = {
     answer: null,
     questionsAsked: 0,
   },
+  unlockedContent: [],
 };
 
 export const useGameStore = create(
@@ -68,6 +69,14 @@ export const useGameStore = create(
           game: { ...state.game, isActive: false, questionsAsked: 0 },
         })),
 
+      spendPoints: (amount) =>
+        set((state) => ({ points: state.points - amount })),
+
+      addUnlockedContent: (contentId) =>
+        set((state) => ({
+          unlockedContent: [...state.unlockedContent, contentId],
+        })),
+
       resetStreak: () =>
         set({ questionStreak: 1, lastQuestionTimestamp: Date.now() }),
 
@@ -87,6 +96,7 @@ export const useGameStore = create(
         userName: state.userName,
         questionStreak: state.questionStreak,
         lastQuestionTimestamp: state.lastQuestionTimestamp,
+        unlockedContent: state.unlockedContent,
       }),
     }
   )
