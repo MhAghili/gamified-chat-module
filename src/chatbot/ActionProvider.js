@@ -29,7 +29,7 @@ class ActionProvider {
 
     try {
       const response = await fetch(
-        "http://localhost:3001/api/getWelcomeMessage",
+        "https://gamified-chat-module-production.up.railway.app/api/getWelcomeMessage",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -61,7 +61,7 @@ class ActionProvider {
 
     try {
       const { userId } = gamificationAPI.useStore.getState();
-      const response = await fetch("http://localhost:3001/api/askAI", {
+      const response = await fetch("https://gamified-chat-module-production.up.railway.app/api/askAI", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, question: message }),
@@ -295,7 +295,7 @@ class ActionProvider {
 
       try {
         const response = await fetch(
-          "http://localhost:3001/api/getSpecialContent",
+          "https://gamified-chat-module-production.up.railway.app/api/getSpecialContent",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
