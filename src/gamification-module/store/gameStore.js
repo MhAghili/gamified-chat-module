@@ -12,7 +12,8 @@ const initialState = {
   game: {
     isActive: false,
     question: null,
-    answer: null,
+    answers: [],
+    difficulty: null,
     questionsAsked: 0,
   },
   unlockedContent: [],
@@ -47,13 +48,14 @@ export const useGameStore = create(
           lastQuestionTimestamp: Date.now(),
         })),
 
-      startGame: (question, answer) =>
+      startGame: (question, answers, difficulty) =>
         set((state) => ({
           game: {
             ...state.game,
             isActive: true,
             question,
-            answer,
+            answers,
+            difficulty,
           },
         })),
       incrementQuestionsAsked: () =>

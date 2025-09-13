@@ -61,11 +61,14 @@ class ActionProvider {
 
     try {
       const { userId } = gamificationAPI.useStore.getState();
-      const response = await fetch("https://gamified-chat-module-production.up.railway.app/api/askAI", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, question: message }),
-      });
+      const response = await fetch(
+        "https://gamified-chat-module-production.up.railway.app/api/askAI",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, question: message }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -92,12 +95,16 @@ class ActionProvider {
     const gameChoice = games[Math.floor(Math.random() * games.length)];
 
     if (gameChoice === "quiz") {
+      debugger;
       const { startGame } = gamificationAPI.useStore.getState();
       const randomIndex = Math.floor(Math.random() * gameQuestions.length);
-      const { question, answer } = gameQuestions[randomIndex];
-      startGame(question, answer.toLowerCase());
+
+      const { question, answers, difficulty } = gameQuestions[randomIndex];
+
+      startGame(question, answers, difficulty);
+
       const gameMessage = this.createChatBotMessage(
-        `بسیار خب، بازی کوییز! سوال اینه: ${question}`
+        `بسیار خب، بازی کوییز شروع شد. ۵ سوال ازت میپرسم!\n\nسطح: ${difficulty}\nسوال:\n${question}`
       );
       this.addMessageToState(gameMessage);
     } else if (gameChoice === "rps") {
@@ -174,23 +181,40 @@ class ActionProvider {
   };
 
   handleGameAnswer = (userAnswer) => {
+    debugger;
     const { game, endGame, addPoints, incrementQuestionsAsked } =
       gamificationAPI.useStore.getState();
 
-    if (userAnswer.includes(game.answer)) {
-      const pointsToAward = 50;
+    const isCorrect = game.answers.some((correctAnswer) =>
+      userAnswer.includes(correctAnswer.toLowerCase())
+    );
+
+    if (isCorrect) {
+      let pointsToAward = 0;
+      switch (game.difficulty) {
+        case "easy":
+          pointsToAward = 50;
+          break;
+        case "medium":
+          pointsToAward = 75;
+          break;
+        case "hard":
+          pointsToAward = 125;
+          break;
+        default:
+          pointsToAward = 50;
+      }
       const winMessage = this.createChatBotMessage(
-        `آفرین درست گفتی! ${pointsToAward} امتیاز گرفتی.`
+        `عالی بود، کاملاً درسته! ${pointsToAward} امتیاز گرفتی.`
       );
       this.addMessageToState(winMessage);
       addPoints(pointsToAward);
     } else {
       const loseMessage = this.createChatBotMessage(
-        `اشتباه بود! جواب صحیح '${game.answer}' بود.`
+        `اشتباه بود! جواب‌های صحیح: ${game.answers.join(" یا ")}`
       );
       this.addMessageToState(loseMessage);
     }
-
     incrementQuestionsAsked();
 
     var { questionsAsked } = gamificationAPI.useStore.getState().game;
@@ -208,11 +232,13 @@ class ActionProvider {
   askNewGameQuestion = () => {
     const { startGame } = gamificationAPI.useStore.getState();
     const randomIndex = Math.floor(Math.random() * gameQuestions.length);
-    const { question, answer } = gameQuestions[randomIndex];
+    const { question, answers, difficulty } = gameQuestions[randomIndex];
 
-    startGame(question, answer.toLowerCase());
+    startGame(question, answers, difficulty);
 
-    const gameMessage = this.createChatBotMessage(`سوال جدید: ${question}`);
+    const gameMessage = this.createChatBotMessage(
+      `سوال جدید!\n\nسطح: ${difficulty}\nسوال:\n${question}`
+    );
     this.addMessageToState(gameMessage);
   };
 
