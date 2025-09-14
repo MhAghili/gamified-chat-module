@@ -68,11 +68,6 @@ const Hangman = (props) => {
     props.actionProvider.handleHangmanGuess(letter);
   };
 
-  const displayWord = secretWord
-    .split("")
-    .map((char, index) => (guessedLetters.includes(char) ? char : "_"))
-    .join(" ");
-
   return (
     <GameContainer>
       <HangmanStatus>خطاهای شما: {errorCount} / 8</HangmanStatus>
