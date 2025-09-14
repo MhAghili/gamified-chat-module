@@ -1,13 +1,36 @@
 // src/chatbot/ActionProvider.js
 import { gamificationAPI } from "../gamification-module";
 import { gameQuestions } from "./gameQuestions";
+import { hangmanWords } from "./hangmanWords";
+
+const HANGMAN_MAX_GUESSES = 8;
 
 export const actionProviderRef = { current: null };
 
+const games = ["quiz", "rps", "tictactoe", "hangman"];
+let gamesToPlay = [...games];
+
 const rewards = [
-  { id: "microservices", name: "توضیح معماری میکروسرویس", cost: 150 },
-  { id: "sql_vs_nosql", name: "مقایسه SQL و NoSQL", cost: 200 },
-  { id: "dijkstra", name: "آموزش الگوریتم Dijkstra", cost: 250 },
+  {
+    id: "microservices",
+    name: "توضیح معماری میکروسرویس",
+    cost: 150,
+    type: "content",
+  },
+  {
+    id: "sql_vs_nosql",
+    name: "مقایسه SQL و NoSQL",
+    cost: 200,
+    type: "content",
+  },
+  {
+    id: "dijkstra",
+    name: "آموزش الگوریتم Dijkstra",
+    cost: 250,
+    type: "content",
+  },
+  { id: "dark", name: "خرید تم تاریک", cost: 300, type: "theme" },
+  { id: "forest", name: "خرید تم جنگل", cost: 300, type: "theme" },
 ];
 
 const MAX_GAME_QUESTIONS = 5;
@@ -90,11 +113,62 @@ class ActionProvider {
     this.sendGamificationFeedback();
   };
 
-  handleStartGame = () => {
-    const games = ["quiz", "rps", "tictactoe"];
-    const gameChoice = games[Math.floor(Math.random() * games.length)];
+  handleHangmanGuess = (letter) => {
+    const { guessLetter, hangmanGame, endHangman, addPoints } =
+      gamificationAPI.useStore.getState();
 
-    if (gameChoice === "quiz") {
+    if (!hangmanGame.isActive) return;
+
+    guessLetter(letter);
+
+    const newState = gamificationAPI.useStore.getState().hangmanGame;
+    const wordIsGuessed = newState.secretWord
+      .split("")
+      .every((char) => newState.guessedLetters.includes(char));
+    const isGameOver = newState.errorCount >= HANGMAN_MAX_GUESSES;
+
+    if (wordIsGuessed) {
+      const winMessage = this.createChatBotMessage(
+        `عالی بود! کلمه '${newState.secretWord}' رو پیدا کردی و 150 امتیاز گرفتی!`
+      );
+      this.addMessageToState(winMessage);
+      addPoints(150);
+      endHangman();
+    } else if (isGameOver) {
+      const loseMessage = this.createChatBotMessage(
+        `باختی! کلمه صحیح '${newState.secretWord}' بود.`
+      );
+      this.addMessageToState(loseMessage);
+      endHangman();
+    }
+  };
+
+  handleStartGame = () => {
+    // check if all games have been played
+    if (gamesToPlay.length === 0) {
+      gamesToPlay = [...games];
+    }
+
+    const gameChoice =
+      gamesToPlay[Math.floor(Math.random() * gamesToPlay.length)];
+
+    // remove the chosen game from the list
+    gamesToPlay = gamesToPlay.filter((game) => game !== gameChoice);
+
+    if (gameChoice === "hangman") {
+      const { startHangman } = gamificationAPI.useStore.getState();
+      const randomWord =
+        hangmanWords[Math.floor(Math.random() * hangmanWords.length)];
+      startHangman(randomWord);
+
+      const gameMessage = this.createChatBotMessage(
+        "بازی حدس کلمه! می‌تونی کلمه فنی رو حدس بزنی؟",
+        {
+          widget: "hangmanGame",
+        }
+      );
+      this.addMessageToState(gameMessage);
+    } else if (gameChoice === "quiz") {
       debugger;
       const { startGame } = gamificationAPI.useStore.getState();
       const randomIndex = Math.floor(Math.random() * gameQuestions.length);
@@ -307,15 +381,35 @@ class ActionProvider {
 
   handlePurchase = async (rewardId) => {
     const reward = rewards.find((r) => r.id === rewardId);
-    const { points, spendPoints, addUnlockedContent } =
-      gamificationAPI.useStore.getState();
+    const {
+      points,
+      spendPoints,
+      addUnlockedContent,
+      unlockTheme,
+      setActiveTheme,
+    } = gamificationAPI.useStore.getState();
 
-    if (points >= reward.cost) {
-      spendPoints(reward.cost);
+    if (points < reward.cost) {
+      const sorryMessage = this.createChatBotMessage(
+        "متاسفانه امتیازت کافی نیست."
+      );
+      this.addMessageToState(sorryMessage);
+      return;
+    }
+
+    spendPoints(reward.cost);
+
+    if (reward.type === "theme") {
+      unlockTheme(reward.id);
+      setActiveTheme(reward.id);
+      const successMessage = this.createChatBotMessage(
+        `عالیه! تم '${reward.name}' خریداری و فعال شد.`
+      );
+      this.addMessageToState(successMessage);
+    } else {
       addUnlockedContent(reward.id);
-
       const thinkingMessage = this.createChatBotMessage(
-        "عالیه! در حال آماده کردن محتوای ویژه برای شما..."
+        "عالیه! در حال آماده کردن محتوای ویژه..."
       );
       this.addMessageToState(thinkingMessage);
 
@@ -336,12 +430,6 @@ class ActionProvider {
           this.createChatBotMessage("متاسفانه مشکلی پیش آمد.")
         );
       }
-    } else {
-      // این حالت به دلیل disabled بودن دکمه نباید اتفاق بیفتد، اما برای اطمینان است
-      const sorryMessage = this.createChatBotMessage(
-        "متاسفانه امتیازت کافی نیست."
-      );
-      this.addMessageToState(sorryMessage);
     }
   };
 

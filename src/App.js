@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { gamificationAPI } from "./gamification-module";
 import ChatbotComponent from "./chatbot-host/ChatbotComponent";
+import "./chatbot/theme.css";
 
 const getOrSetUserId = () => {
   let userId = localStorage.getItem("chatbot_user_id");
@@ -15,6 +16,8 @@ const getOrSetUserId = () => {
 const App = () => {
   const [showChatbot, setShowChatbot] = useState(false);
 
+  const activeTheme = gamificationAPI.useStore((state) => state.activeTheme);
+
   useEffect(() => {
     const userId = getOrSetUserId();
     gamificationAPI.init(userId);
@@ -26,7 +29,7 @@ const App = () => {
 
   return (
     <div>
-      <header style={{ padding: "20px", direction:"rtl", backgroundColor: "#eee" }}>
+      <header style={{ padding: "20px", backgroundColor: "#eee" }}>
         <h1>پروژه چت‌بات گیمیفای‌شده</h1>
         <p>روی آیکون چت در پایین صفحه کلیک کنید.</p>
       </header>
@@ -36,7 +39,7 @@ const App = () => {
       </button>
 
       {showChatbot && (
-        <div style={styles.chatbotWrapper}>
+        <div style={styles.chatbotWrapper} className={`theme-${activeTheme}`}>
           <ChatbotComponent />
         </div>
       )}

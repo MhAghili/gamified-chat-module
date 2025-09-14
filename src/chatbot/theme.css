@@ -1,0 +1,28 @@
+/* src/chatbot/themes.css */
+
+/* --- Dark Theme --- */
+.theme-dark .react-chatbot-kit-chat-container {
+  background-color: #2c2c2c;
+}
+.theme-dark .react-chatbot-kit-chat-header {
+  background-color: #1a1a1a;
+}
+.theme-dark .react-chatbot-kit-chat-bot-message {
+  background-color: #5a5a5a;
+  color: white;
+}
+.theme-dark .react-chatbot-kit-user-chat-message {
+  background-color: #007bff;
+}
+
+/* --- Forest Theme --- */
+.theme-forest .react-chatbot-kit-chat-container {
+  background-color: #f0f5f0;
+}
+.theme-forest .react-chatbot-kit-chat-header {
+  background-color: #2f5d2f;
+}
+.theme-forest .react-chatbot-kit-chat-bot-message {
+  background-color: #4a7c4a;
+  color: white;
+}

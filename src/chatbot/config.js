@@ -5,6 +5,7 @@ import BadgeList from "../gamification-module/components/BadgeList";
 import OptionsWidget from "../gamification-module/components/OptionsWidget";
 import RockPaperScissors from "../gamification-module/components/RockPaperScissors";
 import TicTacToe from "../gamification-module/components/TicTacToe";
+import Hangman from "../gamification-module/components/Hangman";
 
 import { gamificationAPI } from "../gamification-module";
 
@@ -59,6 +60,10 @@ const createChatbotConfig = () => {
       {
         widgetName: "ticTacToe",
         widgetFunc: (props) => <TicTacToe {...props} />,
+      },
+      {
+        widgetName: "hangmanGame",
+        widgetFunc: (props) => <Hangman {...props} />,
       },
     ],
   };
