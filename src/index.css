@@ -1,4 +1,3 @@
-
 @font-face {
   font-family: "MyPersianFont";
   src: url("./Fonts/IRANSansXFaNum-Regular.woff") format("woff");
@@ -15,3 +14,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.react-chatbot-kit-chat-bot-message {
+  direction: rtl;
+}
