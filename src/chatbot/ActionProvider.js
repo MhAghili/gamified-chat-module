@@ -255,7 +255,6 @@ class ActionProvider {
   };
 
   handleGameAnswer = (userAnswer) => {
-    debugger;
     const { game, endGame, addPoints, incrementQuestionsAsked } =
       gamificationAPI.useStore.getState();
 
